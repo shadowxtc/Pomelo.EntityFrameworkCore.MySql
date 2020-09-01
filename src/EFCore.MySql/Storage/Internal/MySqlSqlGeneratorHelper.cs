@@ -69,7 +69,7 @@ namespace Pomelo.EntityFrameworkCore.MySql.Storage.Internal
         ///     The generated string.
         /// </returns>
         public override string DelimitIdentifier(string name, string schema)
-            => base.DelimitIdentifier(GetObjectName(name, schema), GetSchemaName(name, schema));
+            => $"`{schema}`.`{name}`";
 
         /// <summary>
         ///     Writes the delimited SQL representation of an identifier (column name, table name, etc.).
@@ -78,13 +78,12 @@ namespace Pomelo.EntityFrameworkCore.MySql.Storage.Internal
         /// <param name="name">The identifier to delimit.</param>
         /// <param name="schema">The schema of the identifier.</param>
         public override void DelimitIdentifier(StringBuilder builder, string name, string schema)
-            => base.DelimitIdentifier(builder, GetObjectName(name, schema), GetSchemaName(name, schema));
-
-        protected virtual string GetObjectName(string name, string schema)
-            => !string.IsNullOrEmpty(schema) && _options.SchemaNameTranslator != null
-                ? _options.SchemaNameTranslator(schema, name)
-                : name;
-
-        protected virtual string GetSchemaName(string name, string schema) => null;
+        {
+            builder.Append('`');
+            builder.Append(schema);
+            builder.Append("`.`");
+            builder.Append(name);
+            builder.Append("`");
+        }
     }
 }
